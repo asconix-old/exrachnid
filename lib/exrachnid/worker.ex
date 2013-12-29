@@ -21,9 +21,10 @@ defmodule Exrachnid.Worker do
     #       2. Next, Exrachnid.Supervisor.start_child(url) is called.
     #       3. Then, Exrachnid.Worker.start_link(url) is called.
     #       4. The process is then attached to the supervision tree.
-    { :ok, pid } = Exrachnid.Supervisor.start_child(url)
+    { :ok, pid } = Exrachnid.WorkerSupervisor.start_child(url)
 
     # Start the crawl
+    IO.puts "Sent :crawl: #{url}"
     :gen_server.cast(pid, { :crawl, url })
   end
 
@@ -38,10 +39,16 @@ defmodule Exrachnid.Worker do
   def handle_cast({ :crawl, url }, _state) do
     case HTTPotion.get(url, @user_agent, []) do
       Response[body: body, status_code: status, headers: _headers] when status in 200..299 ->
-        links = body |> extract_links
-        # TODO: Send extracted links to manager. 
-        IO.puts links
-        { :stop, :normal, links }
+
+        # Add fetched url
+        IO.puts "======"
+        IO.puts url
+
+        Exrachnid.add_fetched_url(url)
+
+        # Add extracted links
+        body |> extract_links |> Exrachnid.add_new_urls
+        { :stop, :normal, [] }
       _ -> 
         { :stop, :normal, [] }
     end

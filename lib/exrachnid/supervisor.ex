@@ -9,25 +9,23 @@ defmodule Exrachnid.Supervisor do
     :supervisor.start_link({:local, __MODULE__}, __MODULE__, [])
   end
 
-  def start_child(url) do
-    :supervisor.start_child(__MODULE__, [url])
-  end
-
-  #######################
-  # Supervisor Callback #
-  #######################
-
-  # NOTE: This is the only callback we need to implement for supervisors.
+  ########################
+  # Supervisor Callbacks #
+  ########################
   def init([]) do
+    # NOTE: We can see a nice visualization by :appmon.start
     children = [
-      # NOTE: :temporary means that a child process is never restarted. 
-      #       Might change this to transient. I'm not too sure yet.
-    
-      # NOTE: By default, Exrachnid.Worker.start_link would be called. But, 
-      #       since we are using :simple_one_for_one, no child is started.
-      worker(Exrachnid.Worker, [], restart: :temporary)
+      # NOTE: If we leave out the restart strategy, it defaults to 
+      #       :permanent.
+      worker(Exrachnid.DbServer, []),
+      worker(Exrachnid.WorkerSupervisor, [])
     ]
 
-    supervise(children, strategy: :simple_one_for_one)
+    # NOTE: Previously made a stupid mistake. If we changed this to
+    #       strategy: :simple_one_for_one, this would crash with a
+    #       bad_start_spec error. Why? Because :simple_one_for_one
+    #       means we cannot have the restart strategy to be permanent.
+    supervise(children, strategy: :one_for_one)
   end
+
 end
