@@ -11,7 +11,7 @@ defmodule Exrachnid.Worker do
   def start_link(url) do
     # NOTE: We do not need a singleton server. Hence, we leave out the
     #       {:local, name} bit.
-    :gen_server.start_link(__MODULE__, [url], [])
+    :gen_server.start_link(__MODULE__, [url], [{:trace}])
   end
 
   def crawl(url) do
@@ -23,8 +23,6 @@ defmodule Exrachnid.Worker do
     #       4. The process is then attached to the supervision tree.
     { :ok, pid } = Exrachnid.WorkerSupervisor.start_child(url)
 
-    # Start the crawl
-    IO.puts "Sent :crawl: #{url}"
     :gen_server.cast(pid, { :crawl, url })
   end
 
@@ -36,18 +34,21 @@ defmodule Exrachnid.Worker do
     { :ok, [] }
   end
 
+
   def handle_cast({ :crawl, url }, _state) do
     case HTTPotion.get(url, @user_agent, []) do
       Response[body: body, status_code: status, headers: _headers] when status in 200..299 ->
-
-        # Add fetched url
-        IO.puts "======"
-        IO.puts url
-
+        
+        # If it's a relative link, extra the domain bit.  
         Exrachnid.add_fetched_url(url)
 
+        host = URI.parse(url).host
+        
         # Add extracted links
-        body |> extract_links |> Exrachnid.add_new_urls
+        body          
+        |> extract_links(host)
+        |> Exrachnid.add_new_urls
+
         { :stop, :normal, [] }
       _ -> 
         { :stop, :normal, [] }
@@ -70,11 +71,25 @@ defmodule Exrachnid.Worker do
   # Private functions #
   #####################
 
-  def extract_links(page) do
+  def extract_links(page, host) do
     result = %r/<a[^>]* href="([^"]*)"/ |> Regex.scan(page) 
-    case is_list(result) do
+    links = case is_list(result) do
       true  -> result |> Enum.map(fn [_,x] -> x end)
       false -> []
     end
+    
+    links |> Enum.map(fn(url) -> normalize_link(host, url) end)
+  end
+
+  # If URL is fully qualified, the ignore. Else attach host
+  def normalize_link(host, url) do
+    uri_info = URI.parse(url)
+    result = case uri_info.host do
+      nil -> 
+        "#{host}#{uri_info.path}" 
+      _ -> 
+        url
+    end
+    result
   end
 end

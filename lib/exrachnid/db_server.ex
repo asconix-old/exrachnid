@@ -29,19 +29,17 @@ defmodule Exrachnid.DbServer do
   end
 
   def handle_call({ :add_new_urls, urls }, _from, state) do
-    # When adding new url, check that it hasn't been fetched yet.
     new_urls = Enum.reject(urls, fn(url) -> HashSet.member?(state.fetched_urls, url) end)
     
     case new_urls do
       [] -> 
         new_state = state
-        { :reply, [], new_state } 
       _ ->
         new_state = State.new(new_urls: HashSet.union(HashSet.new(new_urls), 
                                                       state.new_urls), 
                               fetched_urls: state.fetched_urls)
-        { :reply, new_urls, new_state } 
     end
+    { :reply, new_urls, new_state } 
   end
 
   def handle_cast({ :add_fetched_url, url }, state) do
@@ -57,7 +55,6 @@ defmodule Exrachnid.DbServer do
   end
 
   def handle_info(message, _state) do
-    IO.puts message
   end
 
   def terminate(_reason, _state) do
