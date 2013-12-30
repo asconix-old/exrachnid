@@ -35,20 +35,25 @@ defmodule Exrachnid.Worker do
   end
 
   def handle_cast({ :crawl, url }, _state) do
-    case HTTPotion.get(url, @user_agent, []) do
-      Response[body: body, status_code: status, headers: _headers] when status in 200..299 ->
-        
-        Exrachnid.add_fetched_url(url)
+    try do
+      case HTTPotion.get(url, @user_agent, []) do
+        Response[body: body, status_code: status, headers: _headers] when status in 200..299 ->
+          
+          Exrachnid.add_fetched_url(url)
 
-        host = URI.parse(url).host
-        
-        # Add extracted links
-        body          
-          |> extract_links(host)
-          |> Exrachnid.add_new_urls
+          host = URI.parse(url).host
+          
+          # Add extracted links
+          body          
+            |> extract_links(host)
+            |> Exrachnid.add_new_urls
 
-      _ -> 
-        # TODO: Do nothing yet.
+        _ -> 
+          # TODO: Do nothing yet.
+      end
+    rescue
+      _error ->
+        # TODO: Do nothing yet.    
     end
     { :stop, :normal, [] }
   end
