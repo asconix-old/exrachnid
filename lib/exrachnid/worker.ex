@@ -34,29 +34,26 @@ defmodule Exrachnid.Worker do
     { :ok, [] }
   end
 
-
   def handle_cast({ :crawl, url }, _state) do
     case HTTPotion.get(url, @user_agent, []) do
       Response[body: body, status_code: status, headers: _headers] when status in 200..299 ->
         
-        # If it's a relative link, extra the domain bit.  
         Exrachnid.add_fetched_url(url)
 
         host = URI.parse(url).host
         
         # Add extracted links
         body          
-        |> extract_links(host)
-        |> Exrachnid.add_new_urls
+          |> extract_links(host)
+          |> Exrachnid.add_new_urls
 
-        { :stop, :normal, [] }
       _ -> 
-        { :stop, :normal, [] }
+        # TODO: Do nothing yet.
     end
+    { :stop, :normal, [] }
   end
 
-  def handle_info(msg, _state) do
-    IO.puts "Received: #{msg}"
+  def handle_info(_msg, _state) do
   end
 
   def code_change(_old_vsn, _state, _extra) do

@@ -54,7 +54,7 @@ defmodule Exrachnid.DbServer do
     { :noreply, new_state } 
   end
 
-  def handle_info(message, _state) do
+  def handle_info(_message, _state) do
   end
 
   def terminate(_reason, _state) do
