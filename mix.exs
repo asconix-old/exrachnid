@@ -5,6 +5,7 @@ defmodule Exrachnid.Mixfile do
     [ app: :exrachnid,
       version: "0.0.1",
       elixir: "~> 0.12.1-dev",
+      elixirc_options: options(Mix.env),
       deps: deps ]
   end
 
@@ -12,13 +13,22 @@ defmodule Exrachnid.Mixfile do
   def application do
     [
       mod: { Exrachnid, [] },
-      applications: [ :httpotion ]
+      applications: [ :httpotion, :exlager ]
     ]
+  end
+
+  def options(env) when env in [:dev, :test] do
+    [ exlager_level: :debug ]
+  end
+
+  def options(env) when env in [:prod] do
+    [ exlager_level: :warning ]
   end
 
   defp deps do
     [ 
-      { :httpotion, github: "myfreeweb/httpotion" }
+      { :httpotion, github: "myfreeweb/httpotion" },
+      { :exlager, github: "khia/exlager" }
     ]
   end
 end

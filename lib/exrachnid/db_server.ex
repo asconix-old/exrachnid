@@ -45,6 +45,7 @@ defmodule Exrachnid.DbServer do
   def handle_cast({ :add_fetched_url, url }, state) do
     new_state = State.new(new_urls: state.new_urls, 
                           fetched_urls: HashSet.put(state.fetched_urls, url))
+    IO.puts "FETCHED: #{new_state.fetched_urls.size}"
     { :noreply, new_state } 
   end
 
@@ -52,13 +53,6 @@ defmodule Exrachnid.DbServer do
     new_state = State.new(new_urls: HashSet.delete(state.new_urls, url),
                           fetched_urls: state.fetched_urls)
     { :noreply, new_state } 
-  end
-
-  def handle_info(_message, _state) do
-  end
-
-  def terminate(_reason, _state) do
-    :ok
   end
 
 end

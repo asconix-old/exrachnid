@@ -1,2 +1,6 @@
-[ "httpotion": {:git, "git://github.com/myfreeweb/httpotion.git", "f41ad7b86cf0de5ce2830323290b30f55df17f17", []},
-  "ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "d824491d37449763ac44398f8494731e0c1418c1", []} ]
+[ "exlager": {:git, "git://github.com/khia/exlager.git", "0b840aae773e6eb6de7cdbb703b47031b6608bfb", []},
+  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "1d883423ac360b3536ca52dc733a0164bacf3109", [{:tag, "0.1.5"}]},
+  "httpotion": {:git, "git://github.com/myfreeweb/httpotion.git", "f41ad7b86cf0de5ce2830323290b30f55df17f17", []},
+  "ibrowse": {:git, "git://github.com/cmullaparthi/ibrowse.git", "d824491d37449763ac44398f8494731e0c1418c1", []},
+  "lager": {:git, "https://github.com/basho/lager.git", "7763143a293edebb2885d8a7cf8124778edb8bba", []},
+  "poolboy": {:git, "git://github.com/devinus/poolboy.git", "c2c939b51aba06790ca51fa78b14c254a6ea977d", [{:tag, "1.0.1"}]} ]

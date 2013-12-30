@@ -19,6 +19,7 @@ defmodule Exrachnid.WorkerSupervisor do
 
   # NOTE: This is the only callback we need to implement for supervisors.
   def init([]) do
+
     children = [
       # NOTE: :temporary means that a child process is never restarted. 
       #       Might change this to transient. I'm not too sure yet.
