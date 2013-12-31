@@ -17,9 +17,8 @@ defmodule Exrachnid do
   end
 
   def add_new_urls(urls) do
-    urls 
-      |> Exrachnid.DbServer.add_new_urls 
-      |> Enum.each(fn(url) -> crawl(url) end)
+    urls |> Exrachnid.DbServer.add_new_urls 
+      # |> Enum.each(fn(url) -> crawl(url) end)
   end
 
   def add_fetched_url(url) do
@@ -30,4 +29,7 @@ defmodule Exrachnid do
     Exrachnid.DbServer.remove_new_url(url)
   end
 
+  def request_new_url do
+    Exrachnid.DbServer.request_new_url |> crawl
+  end
 end

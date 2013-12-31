@@ -21,6 +21,10 @@ defmodule Exrachnid.DbServer do
     :gen_server.cast(__MODULE__, {:add_fetched_url, url})
   end
 
+  def request_new_url do
+    :gen_server.call(__MODULE__, :request_new_url)
+  end
+
   #######################
   # GenServer callbacks #
   #######################
@@ -40,21 +44,28 @@ defmodule Exrachnid.DbServer do
                                                       state.new_urls), 
                               fetched_urls: state.fetched_urls)
     end
-    { :reply, new_urls, new_state } 
+    {:reply, new_urls, new_state} 
+  end
+
+  def handle_call(:request_new_url, _from, state) do
+    [h|t] = state.new_urls |> HashSet.to_list 
+    new_state = State.new(new_urls: HashSet.new(t), 
+                          fetched_urls: state.fetched_urls)
+    {:reply, h, new_state}
   end
 
   def handle_cast({:add_fetched_url, url}, state) do
     new_state = State.new(new_urls: state.new_urls, 
                           fetched_urls: HashSet.put(state.fetched_urls, url))
     Lager.info "Fetched: #{new_state.fetched_urls.size}"
-    { :noreply, new_state } 
+    {:noreply, new_state} 
   end
 
   def handle_cast({:remove_new_url, url}, state) do
     new_state = State.new(new_urls: HashSet.delete(state.new_urls, url),
                           fetched_urls: state.fetched_urls)
     Lager.info "Remaining: #{new_state.new_urls.size}"
-    { :noreply, new_state } 
+    {:noreply, new_state} 
   end
 
 end

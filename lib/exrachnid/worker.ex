@@ -36,11 +36,14 @@ defmodule Exrachnid.Worker do
       body          
         |> extract_links(host)
         |> Exrachnid.add_new_urls
-
     rescue
       error ->
       Lager.error error
     end
+    
+    # Ask for a new url
+    Exrachnid.request_new_url
+      
     { :stop, :normal, [] }
   end
 
