@@ -6,8 +6,8 @@ defmodule Exrachnid.Worker do
   # API #
   ####### 
 
-  def start_link(url) do
-    :gen_server.start_link(__MODULE__, [url], [{:trace}])
+  def start_link(_args) do
+    :gen_server.start_link(__MODULE__, [], [{:trace}])
   end
 
   def crawl(url) do

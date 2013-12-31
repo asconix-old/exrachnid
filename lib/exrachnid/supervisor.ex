@@ -12,6 +12,7 @@ defmodule Exrachnid.Supervisor do
   ########################
   # Supervisor Callbacks #
   ########################
+
   def init([]) do
     # NOTE: We can see a nice visualization by :appmon.start
     children = [
