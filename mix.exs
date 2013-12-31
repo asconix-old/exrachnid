@@ -13,7 +13,12 @@ defmodule Exrachnid.Mixfile do
   def application do
     [
       mod: { Exrachnid, [] },
-      applications: [ :httpotion, :exlager ]
+      applications: [ 
+                      :inets,
+                      :ibrowse,
+                      :hackney,
+                      :exlager 
+                    ]
     ]
   end
 
@@ -27,8 +32,10 @@ defmodule Exrachnid.Mixfile do
 
   defp deps do
     [ 
-      { :httpotion, github: "myfreeweb/httpotion" },
-      { :exlager, github: "khia/exlager" }
+      { :ibrowse, github: "cmullaparthi/ibrowse" },
+      { :hackney, github: "benoitc/hackney" },
+      { :exlager, github: "khia/exlager" },
+      { :poolboy, github: "devinus/poolboy", tag: "1.0.0" }
     ]
   end
 end
