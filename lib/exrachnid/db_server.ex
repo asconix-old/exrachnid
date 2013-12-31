@@ -29,7 +29,7 @@ defmodule Exrachnid.DbServer do
     { :ok, State.new(new_urls: HashSet.new, fetched_urls: HashSet.new) }
   end
 
-  def handle_call({ :add_new_urls, urls }, _from, state) do
+  def handle_call({:add_new_urls, urls}, _from, state) do
     new_urls = Enum.reject(urls, fn(url) -> HashSet.member?(state.fetched_urls, url) end)
     
     case new_urls do
@@ -43,14 +43,14 @@ defmodule Exrachnid.DbServer do
     { :reply, new_urls, new_state } 
   end
 
-  def handle_cast({ :add_fetched_url, url }, state) do
+  def handle_cast({:add_fetched_url, url}, state) do
     new_state = State.new(new_urls: state.new_urls, 
                           fetched_urls: HashSet.put(state.fetched_urls, url))
     Lager.info "Fetched: #{new_state.fetched_urls.size}"
     { :noreply, new_state } 
   end
 
-  def handle_cast({ :remove_new_url, url }, state) do
+  def handle_cast({:remove_new_url, url}, state) do
     new_state = State.new(new_urls: HashSet.delete(state.new_urls, url),
                           fetched_urls: state.fetched_urls)
     Lager.info "Remaining: #{new_state.new_urls.size}"

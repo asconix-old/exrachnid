@@ -7,23 +7,11 @@ defmodule Exrachnid.Worker do
   ####### 
 
   def start_link(url) do
-    # NOTE: We do not need a singleton server. Hence, we leave out the
-    #       {:local, name} bit.
     :gen_server.start_link(__MODULE__, [url], [{:trace}])
   end
 
   def crawl(url) do
     Lager.info url
-    # NOTE: This is slightly round-about. Here is what is happening:
-    # 
-    #       1. We call Exrachnid.Worker.crawl(url).
-    #       2. Next, Exrachnid.Supervisor.start_child(url) is called.
-    #       3. Then, Exrachnid.Worker.start_link(url) is called.
-    #       4. The process is then attached to the supervision tree.
-    # { :ok, pid } = Exrachnid.WorkerSupervisor.start_child(url)
-
-    # :gen_server.cast(pid, { :crawl, url })
-
     :poolboy.transaction(:worker_pool, fn(worker)-> 
                                          :gen_server.cast(worker, {:crawl, url}) 
                                        end)
@@ -38,22 +26,21 @@ defmodule Exrachnid.Worker do
   end
 
   def handle_cast({:crawl, url}, _state) do
-    # try do 
+    try do 
       body = fetch_page(url) 
 
       Exrachnid.add_fetched_url(url)
 
       host = URI.parse(url).host
           
-      # Add extracted links
       body          
         |> extract_links(host)
         |> Exrachnid.add_new_urls
 
-    # rescue
-    #   _error ->
-    #     # TODO: Do nothing yet.    
-    # end
+    rescue
+      error ->
+      Lager.error error
+    end
     { :stop, :normal, [] }
   end
 
