@@ -6,12 +6,11 @@ defmodule Exrachnid.Worker do
   # API #
   ####### 
 
-  def start_link(_args) do
-    :gen_server.start_link(__MODULE__, [], [{:trace}])
+  def start_link(state) do
+    :gen_server.start_link(__MODULE__, state, [{:trace}])
   end
 
   def crawl(url) do
-    Lager.info url
     :poolboy.transaction(:worker_pool, fn(worker)-> 
                                          :gen_server.cast(worker, {:crawl, url}) 
                                        end)
@@ -21,13 +20,14 @@ defmodule Exrachnid.Worker do
   # GenServer callbacks #
   #######################
 
-  def init(_url) do
-    { :ok, [] }
+  def init(state) do
+    { :ok, state }
   end
 
-  def handle_cast({:crawl, url}, _state) do
+  def handle_cast({:crawl, url}, state) do
     try do 
       body = fetch_page(url) 
+      Lager.info url
 
       Exrachnid.add_fetched_url(url)
 
@@ -38,13 +38,13 @@ defmodule Exrachnid.Worker do
         |> Exrachnid.add_new_urls
     rescue
       error ->
-      Lager.error error
+        Lager.error error
     end
     
     # Ask for a new url
-    Exrachnid.request_new_url
+    IO.puts Exrachnid.statistics
       
-    { :stop, :normal, [] }
+    { :noreply, state }
   end
 
   #####################

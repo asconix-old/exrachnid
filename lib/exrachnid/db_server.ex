@@ -25,6 +25,10 @@ defmodule Exrachnid.DbServer do
     :gen_server.call(__MODULE__, :request_new_url)
   end
 
+  def statistics do
+    :gen_server.call(__MODULE__, :statistics)
+  end
+
   #######################
   # GenServer callbacks #
   #######################
@@ -52,6 +56,11 @@ defmodule Exrachnid.DbServer do
     new_state = State.new(new_urls: HashSet.new(t), 
                           fetched_urls: state.fetched_urls)
     {:reply, h, new_state}
+  end
+
+  def handle_call(:statistics, _from, state) do
+    reply = "Fetched: #{state.fetched_urls.size}\nNew: #{state.new_urls.size}"
+    {:reply, reply, state}
   end
 
   def handle_cast({:add_fetched_url, url}, state) do

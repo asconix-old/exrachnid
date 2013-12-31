@@ -8,6 +8,7 @@ defmodule Exrachnid do
   #######
   # API #
   #######
+
   def crawl do
     Exrachnid.Worker.crawl("http://www.zalora.sg")
   end
@@ -18,7 +19,6 @@ defmodule Exrachnid do
 
   def add_new_urls(urls) do
     urls |> Exrachnid.DbServer.add_new_urls 
-      # |> Enum.each(fn(url) -> crawl(url) end)
   end
 
   def add_fetched_url(url) do
@@ -31,5 +31,9 @@ defmodule Exrachnid do
 
   def request_new_url do
     Exrachnid.DbServer.request_new_url |> crawl
+  end
+
+  def statistics do
+    Exrachnid.DbServer.statistics
   end
 end
