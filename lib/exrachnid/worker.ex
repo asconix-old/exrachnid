@@ -12,7 +12,7 @@ defmodule Exrachnid.Worker do
 
   def crawl(url) do
     :poolboy.transaction(:worker_pool, fn(worker)-> 
-                                         :gen_server.cast(worker, {:crawl, url}) 
+                                         :gen_server.call(worker, {:crawl, url}) 
                                        end)
   end
 
@@ -24,7 +24,7 @@ defmodule Exrachnid.Worker do
     { :ok, state }
   end
 
-  def handle_cast({:crawl, url}, state) do
+  def handle_call({:crawl, url}, _from, state) do
     try do 
       body = fetch_page(url) 
       Lager.info url
@@ -40,11 +40,8 @@ defmodule Exrachnid.Worker do
       error ->
         Lager.error error
     end
-    
-    # Ask for a new url
-    IO.puts Exrachnid.statistics
       
-    { :noreply, state }
+    { :reply, url, state }
   end
 
   #####################
@@ -69,6 +66,7 @@ defmodule Exrachnid.Worker do
       false -> []
     end
     
+    # TODO: THERE IS A BUG HERE!
     links |> Enum.map(fn(url) -> normalize_link(host, url) end)
   end
 

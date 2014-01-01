@@ -18,7 +18,7 @@ defmodule Exrachnid.WorkerSupervisor do
     pool_options = [
       name: {:local, :worker_pool},
       worker_module: Exrachnid.Worker,
-      size: 100,
+      size: 5,
       max_overflow: 0
     ]
 

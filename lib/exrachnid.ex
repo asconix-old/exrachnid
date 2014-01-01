@@ -10,11 +10,13 @@ defmodule Exrachnid do
   #######
 
   def crawl do
-    Exrachnid.Worker.crawl("http://www.zalora.sg")
+    Exrachnid.crawl("http://www.zalora.sg")
   end
 
   def crawl(url) do
     Exrachnid.Worker.crawl(url)
+    {:ready, available, _, _} = :poolboy.status(:worker_pool)
+    Enum.each(1..available, fn(_x) -> request_new_url end)
   end
 
   def add_new_urls(urls) do
