@@ -12,7 +12,7 @@ defmodule Exrachnid.Worker do
 
   def crawl(url) do
     :poolboy.transaction(:worker_pool, fn(worker)-> 
-                                         :gen_server.call(worker, {:crawl, url}) 
+                                         :gen_server.cast(worker, {:crawl, url}) 
                                        end)
   end
 
@@ -24,7 +24,7 @@ defmodule Exrachnid.Worker do
     { :ok, state }
   end
 
-  def handle_call({:crawl, url}, _from, state) do
+  def handle_cast({:crawl, url}, state) do
     try do 
       body = fetch_page(url) 
       Lager.info url
@@ -41,7 +41,7 @@ defmodule Exrachnid.Worker do
         Lager.error error
     end
       
-    { :reply, url, state }
+    { :noreply, state }
   end
 
   #####################

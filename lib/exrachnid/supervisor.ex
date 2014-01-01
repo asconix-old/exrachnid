@@ -26,7 +26,7 @@ defmodule Exrachnid.Supervisor do
     #       strategy: :simple_one_for_one, this would crash with a
     #       bad_start_spec error. Why? Because :simple_one_for_one
     #       means we cannot have the restart strategy to be permanent.
-    supervise(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_one, max_restarts: 1000000, max_seconds: 1)
   end
 
 end

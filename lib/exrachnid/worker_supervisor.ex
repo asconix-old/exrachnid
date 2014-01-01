@@ -18,7 +18,7 @@ defmodule Exrachnid.WorkerSupervisor do
     pool_options = [
       name: {:local, :worker_pool},
       worker_module: Exrachnid.Worker,
-      size: 5,
+      size: 10,
       max_overflow: 0
     ]
 
@@ -26,7 +26,7 @@ defmodule Exrachnid.WorkerSupervisor do
       :poolboy.child_spec(:worker_pool, pool_options, [])
     ] 
 
-    supervise(children, strategy: :one_for_one)
-
+    # NOTE: Always restart, no matter what.
+    supervise(children, strategy: :one_for_one, max_restarts: 1000000, max_seconds: 1)
   end
 end

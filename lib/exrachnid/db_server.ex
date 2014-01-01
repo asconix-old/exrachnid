@@ -38,7 +38,12 @@ defmodule Exrachnid.DbServer do
   end
 
   def handle_call({:add_new_urls, urls}, _from, state) do
-    new_urls = Enum.reject(urls, fn(url) -> HashSet.member?(state.fetched_urls, url) end)
+    new_urls = Enum.reject(urls, fn(url) -> 
+                                   HashSet.member?(state.fetched_urls, url) 
+                                 end)
+               |> Enum.reject(fn(url) -> 
+                                      String.starts_with?(url, "/")
+                                    end)
     
     case new_urls do
       [] -> 
@@ -52,10 +57,15 @@ defmodule Exrachnid.DbServer do
   end
 
   def handle_call(:request_new_url, _from, state) do
-    [h|t] = state.new_urls |> HashSet.to_list 
-    new_state = State.new(new_urls: HashSet.new(t), 
-                          fetched_urls: state.fetched_urls)
-    {:reply, h, new_state}
+    case state.new_urls |> HashSet.to_list do
+      [h|t] ->
+        new_state = State.new(new_urls: HashSet.new(t), 
+                              fetched_urls: state.fetched_urls)
+        {:reply, h, new_state}
+      _ -> 
+        new_state = state 
+        {:reply, "", new_state}
+    end
   end
 
   def handle_call(:statistics, _from, state) do

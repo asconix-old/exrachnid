@@ -1,4 +1,5 @@
 defmodule Exrachnid do
+  require Lager
   use Application.Behaviour
 
   def start(_type, _args) do
