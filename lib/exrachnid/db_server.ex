@@ -44,7 +44,7 @@ defmodule Exrachnid.DbServer do
                |> Enum.reject(fn(url) -> 
                                       String.starts_with?(url, "/")
                                     end)
-    
+
     case new_urls do
       [] -> 
         new_state = state

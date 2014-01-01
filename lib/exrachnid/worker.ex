@@ -66,7 +66,6 @@ defmodule Exrachnid.Worker do
       false -> []
     end
     
-    # TODO: THERE IS A BUG HERE!
     links |> Enum.map(fn(url) -> normalize_link(host, url) end)
   end
 
