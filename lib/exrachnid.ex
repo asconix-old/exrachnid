@@ -11,7 +11,7 @@ defmodule Exrachnid do
   #######
 
   def crawl do
-    Exrachnid.crawl("http://www.zalora.sg")
+    Exrachnid.crawl("http://en.wikipedia.org/wiki/Main_Page")
   end
 
   def crawl(url) do
